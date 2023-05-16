@@ -28,7 +28,7 @@ var envOptions = {
 
 // 將 source 裡的 html 複製到 public 
 
-export function ejs() {
+function ejs() {
   return src(['./source/**/*.ejs', './source/**/*.html'])
     .pipe($.plumber())
     .pipe($.frontMatter())
@@ -43,7 +43,7 @@ export function ejs() {
 
 // copy file
 
-export function copy() {
+function copy() {
     return src([
         "./source/**/**",
         "!source/javascripts/**/**",
@@ -57,7 +57,7 @@ export function copy() {
 
 
 // clean
-export function clean(cb) {
+function clean(cb) {
     del(["./public/**", "./.tmp/**"])
     cb()
 }
@@ -88,7 +88,7 @@ function scss() {
 
 
 // JS 合併第三方 JS 套件
-export function vendorJS () {
+function vendorJS () {
     return src([
             "./node_modules/jquery/dist/jquery.slim.min.js",
             "./node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"
@@ -144,7 +144,7 @@ function browser() {
     })
 }
 
-export function devWatch() {
+function devWatch() {
     watch(["./source/**/*.html", "./source/**/*.ejs"], ejs)
     watch(
       [ "./source/style/**/*.scss"], scss)
@@ -154,10 +154,7 @@ export function devWatch() {
 
 // 指令
 
-
-
-gulp.task('default', parallel(imageMin, babel, vendorJS, ejs, scss, browser, devWatch));
-
-gulp.task('build', series(series(clean, copy), parallel(vendorJS, babel, scss, ejs, imageMin)))
+exports.build = gulp.series(clean,copy, ejs, scss, babel, vendorJS, imageMin);
+exports.default = gulp.series(clean,copy, ejs, scss, babel, vendorJS, imageMin, gulp.parallel(browser, devWatch));
 
   
